@@ -7,7 +7,7 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, guestLogin } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -20,6 +20,20 @@ const Login: React.FC = () => {
       navigate('/dashboard');
     } catch (err: any) {
       setError('ログインに失敗しました。メールアドレスとパスワードを確認してください。');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGuestLogin = async () => {
+    try {
+      setError('');
+      setLoading(true);
+      await guestLogin();
+      navigate('/dashboard');
+    } catch (err: any) {
+      setError('ゲストログインに失敗しました。');
       console.error(err);
     } finally {
       setLoading(false);
@@ -74,6 +88,16 @@ const Login: React.FC = () => {
             {loading ? 'ログイン中...' : 'ログイン'}
           </button>
         </form>
+
+        <div className="mt-4">
+          <button
+            onClick={handleGuestLogin}
+            disabled={loading}
+            className="w-full bg-gray-100 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:opacity-50"
+          >
+            ゲストとしてログイン
+          </button>
+        </div>
         
         <div className="mt-4 text-center">
           <p className="text-sm text-gray-600">

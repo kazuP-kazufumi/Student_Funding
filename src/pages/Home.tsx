@@ -70,6 +70,19 @@ const Home: React.FC = () => {
               >
                 ログイン
               </Link>
+              <button
+                onClick={async () => {
+                  try {
+                    await guestLogin();
+                    navigate('/dashboard');
+                  } catch (err) {
+                    console.error('ゲストログインに失敗しました:', err);
+                  }
+                }}
+                className="inline-flex h-12 items-center justify-center rounded-md bg-gray-100 px-8 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-700"
+              >
+                ゲストとして始める
+              </button>
             </div>
             
             {!loading && !hasFundings && (

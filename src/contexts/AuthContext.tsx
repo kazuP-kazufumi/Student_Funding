@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { 
   createUserWithEmailAndPassword, 
   signInWithEmailAndPassword,
+  signInAnonymously,
   signOut,
   onAuthStateChanged,
   User
@@ -13,6 +14,7 @@ interface AuthContextType {
   currentUser: User | null;
   register: (email: string, password: string, username: string) => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
+  guestLogin: () => Promise<void>;
   logout: () => Promise<void>;
   loading: boolean;
   error: string | null;
@@ -23,6 +25,7 @@ const AuthContext = createContext<AuthContextType>({
   currentUser: null,
   register: async () => {},
   login: async () => {},
+  guestLogin: async () => {},
   logout: async () => {},
   loading: true,
   error: null,
@@ -89,6 +92,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const guestLogin = async () => {
+    try {
+      setError(null);
+      const result = await signInAnonymously(auth);
+      
+      // Create guest user profile in Firestore
+      await setDoc(doc(db, 'users', result.user.uid), {
+        username: `ゲスト${result.user.uid.slice(0, 4)}`,
+        isGuest: true,
+        createdAt: new Date().toISOString()
+      });
+      
+      setUserData({ username: `ゲスト${result.user.uid.slice(0, 4)}` });
+    } catch (err: any) {
+      setError(err.message);
+      throw err;
+    }
+  };
+
   const logout = async () => {
     try {
       setError(null);
@@ -103,6 +125,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     currentUser,
     register,
     login,
+    guestLogin,
     logout,
     loading,
     error,

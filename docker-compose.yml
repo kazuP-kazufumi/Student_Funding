@@ -1,0 +1,56 @@
+# Docker Composeのバージョンを指定
+version: '3.8'
+
+services:
+  # 開発用サービス定義
+  app:
+    # Dockerfileからイメージをビルド
+    build:
+      # ビルドコンテキストをカレントディレクトリに設定
+      context: .
+      # Dockerfileの開発環境ステージを使用
+      target: development
+    
+    # ボリュームマウントの設定
+    volumes:
+      # ホストのカレントディレクトリをコンテナの/appにマウント（ソースコードの変更を即時反映）
+      - .:/app
+      # node_modulesディレクトリを永続化（ホストのnode_modulesと分離）
+      - /app/node_modules
+    
+    # ポートフォワーディング設定
+    ports:
+      # ホストの5173番ポートをコンテナの5173番ポートに接続（Viteのデフォルトポート）
+      - "5173:5173"
+    
+    # 環境変数の設定
+    environment:
+      # Node.jsの環境を開発モードに設定
+      - NODE_ENV=development
+    
+    # コンテナ起動時のコマンド（Viteの開発サーバーを起動）
+    command: npm run dev
+
+  # テスト用サービス定義
+  test:
+    # 開発環境と同じDockerfile設定を使用
+    build:
+      context: .
+      target: development
+    
+    # テスト用のボリュームマウント
+    volumes:
+      - .:/app
+      - /app/node_modules
+      # テスト結果の永続化
+      - ./coverage:/app/coverage
+      - ./cypress/videos:/app/cypress/videos
+      - ./cypress/screenshots:/app/cypress/screenshots
+    
+    # テスト用の環境変数
+    environment:
+      - NODE_ENV=test
+      - CI=true
+    
+    # テストの実行
+    command: npm run test 

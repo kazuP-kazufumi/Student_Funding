@@ -1,0 +1,110 @@
+# ワークフローの名前
+name: CI/CD Pipeline
+
+# ワークフローのトリガー設定
+on:
+  # プッシュ時に実行（mainブランチ）
+  push:
+    branches: [ main ]
+  # プルリクエスト時に実行（mainブランチ向け）
+  pull_request:
+    branches: [ main ]
+  # 手動実行用のトリガー
+  workflow_dispatch:
+
+# 環境変数の設定
+env:
+  NODE_VERSION: '20'
+
+# ジョブの定義
+jobs:
+  # テストジョブ
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    
+    steps:
+      # リポジトリのチェックアウト
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Node.jsのセットアップ
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      # 依存関係のインストール
+      - name: Install dependencies
+        run: npm ci
+
+      # リンター実行
+      - name: Run linter
+        run: npm run lint
+
+      # ユニットテスト実行
+      - name: Run unit tests
+        run: npm run test
+
+      # E2Eテスト実行
+      - name: Run E2E tests
+        run: npm run test:e2e
+
+  # ビルドジョブ
+  build:
+    name: Build
+    needs: test  # テストジョブが成功した後に実行
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # プロダクションビルドの実行
+      - name: Build production
+        run: npm run build
+
+      # ビルド成果物の保存
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-files
+          path: dist
+
+  # デプロイジョブ（Vercel）
+  deploy:
+    name: Deploy to Vercel
+    needs: build  # ビルドジョブが成功した後に実行
+    runs-on: ubuntu-latest
+    # 本番環境へのデプロイはmainブランチへのプッシュ時のみ
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ビルド成果物のダウンロード
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-files
+          path: dist
+
+      # Vercelへのデプロイ
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: '--prod' 

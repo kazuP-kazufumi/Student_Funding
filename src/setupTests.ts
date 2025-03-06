@@ -1,10 +1,10 @@
 import '@testing-library/jest-dom';
 import { expect, afterEach } from 'vitest';
 import { cleanup } from '@testing-library/react';
-import matchers from '@testing-library/jest-dom/matchers';
+import * as matchers from '@testing-library/jest-dom/matchers';
 
-// @testing-library/jest-domのマッチャーを追加
-expect.extend(matchers);
+// Vitestの拡張設定
+expect.extend(matchers as any);
 
 // 各テスト後にクリーンアップを実行
 afterEach(() => {

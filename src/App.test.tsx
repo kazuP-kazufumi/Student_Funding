@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import App from './App';
@@ -18,14 +18,14 @@ const TestWrapper = ({ children }: { children: React.ReactNode }) => {
 describe('App', () => {
   it('renders without crashing', () => {
     // TestWrapperでAppコンポーネントをラップ
-    render(
+    const { container } = render(
       <TestWrapper>
         <App />
       </TestWrapper>
     );
 
-    // mainタグの存在を確認（より適切なテスト方法）
-    const mainElement = screen.getByRole('main');
-    expect(mainElement).toBeInTheDocument();
+    // mainタグの存在を確認（より安全なテスト方法）
+    const mainElement = container.querySelector('main');
+    expect(mainElement).toBeTruthy();
   });
 }); 

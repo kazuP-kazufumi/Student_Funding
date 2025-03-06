@@ -10,6 +10,8 @@ export default defineConfig({
     environment: 'happy-dom',
     // グローバルなテストユーティリティを自動的にインポート
     globals: true,
+    // セットアップファイルを指定
+    setupFiles: ['./src/setupTests.ts'],
     // テストのカバレッジ設定
     coverage: {
       provider: 'v8',

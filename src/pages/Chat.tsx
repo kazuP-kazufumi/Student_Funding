@@ -17,12 +17,18 @@ interface ChatUser {
   username: string;
 }
 
+interface UserData {
+  username: string;
+  email?: string;
+  createdAt: string;
+}
+
 const Chat: React.FC = () => {
   const { userId } = useParams<{ userId: string }>();
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState<string | null>(null);
   const [chatUser, setChatUser] = useState<ChatUser | null>(null);
   const { currentUser, userData } = useAuth();
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -125,6 +131,8 @@ const Chat: React.FC = () => {
     );
   }
 
+  if (error) return <div>{error}</div>;
+
   return (
     <div className="max-w-3xl mx-auto h-[calc(100vh-200px)] flex flex-col">
       <div className="bg-white rounded-t-lg shadow-md p-4 border-b">
@@ -132,12 +140,6 @@ const Chat: React.FC = () => {
           {chatUser ? chatUser.username : 'チャット'}とのメッセージ
         </h1>
       </div>
-      
-      {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 m-2 rounded">
-          {error}
-        </div>
-      )}
       
       <div className="flex-grow bg-white overflow-y-auto p-4">
         {messages.length === 0 ? (

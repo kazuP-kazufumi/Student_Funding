@@ -8,7 +8,7 @@ export default defineConfig({
     // テストファイルの配置場所
     specPattern: 'cypress/e2e/**/*.{cy,spec}.{js,jsx,ts,tsx}',
     // テスト実行前の設定
-    setupNodeEvents(on, config) {
+    setupNodeEvents(_on, _config) {
       // カスタムタスクやプラグインの設定をここに記述
     },
   },

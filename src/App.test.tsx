@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest';
 import { render, act } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import App from './App';
 

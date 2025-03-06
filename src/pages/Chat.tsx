@@ -9,7 +9,9 @@ interface Message {
   id: string;
   senderId: string;
   text: string;
-  createdAt: any;
+  createdAt: {
+    toDate: () => Date;
+  } | null;
 }
 
 interface ChatUser {
@@ -30,7 +32,7 @@ const Chat: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [chatUser, setChatUser] = useState<ChatUser | null>(null);
-  const { currentUser, userData } = useAuth();
+  const { currentUser } = useAuth();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Scroll to bottom of messages

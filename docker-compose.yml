@@ -1,6 +1,4 @@
-# Docker Composeのバージョンを指定
-version: '3.8'
-
+# Docker Composeの設定
 services:
   # 開発用サービス定義
   app:
